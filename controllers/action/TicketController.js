@@ -1,6 +1,7 @@
-const Ticket = require("../models/Ticket");
+const Ticket = require("../../models/Ticket");
 const Joi = require('joi');
 const moment = require('moment');
+const User = require("../../models/User");
 
 const TicketController = {
     getTickets: async(req, res) => {
@@ -87,7 +88,13 @@ const TicketController = {
                 status : status,
                 history: []
             })
-            await newTicket.save();
+            newTicket.save().then(async data => {
+                await User.updateOne({name:handledBy},{
+                    $push : {
+                        ticketIDs :data.id,
+                    }
+                })
+            });
             return res.status(200).json({ success: 1 , data : newTicket});
         } catch (err) {
             console.log(err);
@@ -134,7 +141,10 @@ const validateBody = (data,history = false) => {
             responseBy: Joi.string().required(), 
             sensitive: Joi.boolean().required(), 
             date: Joi.date().required(),
-            id : Joi.string().required()
+            id : Joi.string().required(),
+            headers : Joi.object().keys({
+                Authorization: Joi.string().required()
+            }),
         };
     } else {
         params = { 
@@ -143,7 +153,10 @@ const validateBody = (data,history = false) => {
             handledBy: Joi.string().required(), 
             issue: Joi.string().required(), 
             status: Joi.number().required(), 
-            openDate: Joi.date().required()
+            openDate: Joi.date().required(),
+            headers : Joi.object().keys({
+                Authorization: Joi.string().required()
+            }),
         };
     }
 

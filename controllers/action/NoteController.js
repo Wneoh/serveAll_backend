@@ -1,4 +1,4 @@
-const Note = require("../models/Note");
+const Note = require("../../models/Note");
 const Joi = require('joi'); 
 
 const NoteController = {
@@ -106,6 +106,9 @@ const validateBody = (data,edit = false) => {
         handledBy: Joi.string().required(), 
         detail: Joi.string().required(), 
         date: Joi.date().required(), 
+        headers : Joi.object().keys({
+            Authorization: Joi.string().required()
+        }),
     };
 
     if (edit) {

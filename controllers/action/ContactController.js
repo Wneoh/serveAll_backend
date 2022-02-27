@@ -1,4 +1,4 @@
-const Contact = require("../models/Contact");
+const Contact = require("../../models/Contact");
 const moment = require("moment");
 const Joi = require('joi'); 
 
@@ -26,7 +26,6 @@ const ContactController = {
     },
     addContact: async(req, res) => {
         try {
-            console.log(req.body);
             const result = validateBody(req.body); 
             const { error } = result; 
             if (error) {
@@ -108,6 +107,9 @@ const validateBody = (data,edit = false) => {
         phone: Joi.string().required(),
         email: Joi.string().required(), 
         name: Joi.string().required(), 
+        headers : Joi.object().keys({
+            Authorization: Joi.string().required()
+        }),
     };
 
     if (edit) {
